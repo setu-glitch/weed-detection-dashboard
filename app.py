@@ -8,6 +8,7 @@ loading, inference, rendering and the FarmBot boundary live in utils/.
 
 from __future__ import annotations
 
+import base64
 import csv
 import io
 from datetime import datetime
@@ -76,6 +77,24 @@ def load_monitoring_frame():
         )
     stat = path.stat()
     return get_monitoring_frame(str(path), f"{stat.st_size}-{int(stat.st_mtime)}")
+
+
+@st.cache_data(show_spinner=False)
+def _encode_banner(path_str: str, fingerprint: str) -> str:
+    """Inline the masthead photo so it needs no separate HTTP route."""
+    try:
+        data = Path(path_str).read_bytes()
+    except OSError:
+        return ""
+    return "data:image/jpeg;base64," + base64.b64encode(data).decode("ascii")
+
+
+def banner_uri() -> str:
+    path = cfg.ASSETS_DIR / "banner_farmbot.jpg"
+    if not path.is_file():
+        return ""
+    stat = path.stat()
+    return _encode_banner(str(path), f"{stat.st_size}-{int(stat.st_mtime)}")
 
 
 def init_state():
@@ -799,22 +818,25 @@ def page_model_information(statuses, benchmarks):
         st.info(benchmarks.error + " Published accuracy figures are unavailable.")
 
     active = st.session_state.get("active_model")
-    columns = st.columns(len(cfg.MODEL_REGISTRY), gap="small")
-    for column, spec in zip(columns, cfg.MODEL_REGISTRY):
-        benchmark = benchmarks.get(spec.key)
-        value = f"{benchmark.map50:.4f}" if benchmark.map50 is not None else None
-        with column:
-            st.markdown(
-                ui.model_card(
-                    name=spec.label,
-                    year=spec.released,
-                    architecture=spec.architecture,
-                    metric_label="mAP@0.5",
-                    metric_value=value,
-                    selected=spec.key == active,
-                ),
-                unsafe_allow_html=True,
-            )
+    per_row = 3
+    for start in range(0, len(cfg.MODEL_REGISTRY), per_row):
+        row = cfg.MODEL_REGISTRY[start : start + per_row]
+        columns = st.columns(per_row, gap="small")
+        for column, spec in zip(columns, row):
+            benchmark = benchmarks.get(spec.key)
+            value = f"{benchmark.map50:.4f}" if benchmark.map50 is not None else None
+            with column:
+                st.markdown(
+                    ui.model_card(
+                        name=spec.label,
+                        year=spec.released,
+                        architecture=spec.architecture,
+                        metric_label="mAP@0.5",
+                        metric_value=value,
+                        selected=spec.key == active,
+                    ),
+                    unsafe_allow_html=True,
+                )
 
     st.markdown(
         ui.compact(f'<div style="margin:1.2rem 0 0.6rem 0;">{ui.tag("Published study", "published")} '
@@ -1066,7 +1088,14 @@ def main():
         status_text, tone = "No models installed", "warn"
 
     st.markdown(
-        ui.header(cfg.APP_TITLE, cfg.APP_SUBTITLE, cfg.INSTITUTION, status_text, tone),
+        ui.header(
+            cfg.APP_TITLE,
+            cfg.APP_SUBTITLE,
+            cfg.INSTITUTION,
+            status_text,
+            tone,
+            photo_uri=banner_uri(),
+        ),
         unsafe_allow_html=True,
     )
     render_metric_strip()
