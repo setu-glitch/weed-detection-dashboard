@@ -82,7 +82,7 @@ h1, h2, h3, h4 {{ font-family: 'Archivo', 'Inter', sans-serif; color: var(--ink)
 
 .wd-masthead {{
     background: var(--field);
-    min-height: 220px;
+    min-height: 270px;
     position: relative;
     overflow: hidden;
     background-image:
@@ -547,7 +547,7 @@ def masthead_photo_css(data_uri: str) -> str:
         "<style>"
         f".wd-masthead{{--banner:url('{data_uri}');}}"
         '.wd-masthead::after{content:"";position:absolute;top:0;right:0;bottom:0;'
-        "width:46%;background-image:var(--banner);background-size:cover;"
+        "width:45%;background-image:var(--banner);background-size:cover;"
         "background-position:center;background-repeat:no-repeat;z-index:0;"
         f"-webkit-mask-image:{fade};mask-image:{fade};}}"
         "@media (max-width:980px){.wd-masthead::after{width:100%;"
