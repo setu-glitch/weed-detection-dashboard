@@ -82,6 +82,7 @@ h1, h2, h3, h4 {{ font-family: 'Archivo', 'Inter', sans-serif; color: var(--ink)
 
 .wd-masthead {{
     background: var(--field);
+    min-height: 168px;
     background-image:
         radial-gradient(circle at 88% -30%, rgba(70,185,106,.22), transparent 58%);
     border-radius: 16px;
@@ -519,9 +520,45 @@ def _esc(value) -> str:
     return html.escape(str(value), quote=True)
 
 
-def header(title: str, subtitle: str, affiliation: str, status_text: str, tone: str = "ok") -> str:
+def masthead_photo_css(data_uri: str) -> str:
+    """
+    Blend a photograph into the masthead.
+
+    The image is held in a custom property so both the wide and the narrow
+    rule can reference it without repeating the encoded data. On wide screens
+    the fade runs left to right and leaves the headline over solid colour; on
+    narrow screens the layout stacks, so the overlay goes nearly opaque to keep
+    the text readable over whatever lands behind it.
+    """
+    if not data_uri:
+        return ""
+    field = PALETTE["field"]
+    return (
+        "<style>"
+        f".wd-masthead{{--banner:url('{data_uri}');"
+        f"background-image:linear-gradient(100deg,{field} 0%,{field} 40%,"
+        "rgba(20,67,42,.90) 56%,rgba(20,67,42,.55) 78%,rgba(20,67,42,.34) 100%),"
+        "var(--banner);"
+        "background-size:cover;background-position:center right;"
+        "background-repeat:no-repeat;}"
+        "@media (max-width:980px){.wd-masthead{"
+        "background-image:linear-gradient(180deg,rgba(20,67,42,.96) 0%,"
+        "rgba(20,67,42,.80) 100%),var(--banner);"
+        "background-position:center;}}"
+        "</style>"
+    )
+
+
+def header(
+    title: str,
+    subtitle: str,
+    affiliation: str,
+    status_text: str,
+    tone: str = "ok",
+    photo_uri: str = "",
+) -> str:
     dot_class = {"ok": "", "idle": " idle", "warn": " warn"}.get(tone, "")
-    return compact(f"""
+    return masthead_photo_css(photo_uri) + compact(f"""
     <div class="wd-masthead">
         <div>
             <div class="wd-eyebrow">{_esc(affiliation)}</div>
