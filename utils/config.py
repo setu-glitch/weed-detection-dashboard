@@ -224,20 +224,34 @@ def load_benchmarks(path: Path = BENCHMARKS_PATH) -> BenchmarkTable:
 # renderer, so an annotated image always matches the interface around it.
 
 PALETTE = {
-    "paper": "#FBFBF9",
+    # Surfaces
+    "canvas": "#EEF1EA",        # pale field green-grey behind everything
     "surface": "#FFFFFF",
-    "border": "#E4E7E2",
-    "border_strong": "#CBD2CB",
-    "ink": "#16211B",
-    "muted": "#5D6B62",
-    "faint": "#8B968E",
-    "institution": "#3070B3",   # TUM institutional blue
-    "crop": "#2F7D4F",          # soybean plants
-    "crop_soft": "#EAF3ED",
-    "weed": "#C2410C",          # weeds / intervention targets
-    "weed_soft": "#FBEDE6",
-    "signal": "#1F9D55",        # live / online indicators
-    "warning": "#B45309",
+    "line": "#D8DED4",
+    "paper": "#EEF1EA",         # alias used by the image renderer
+    "border": "#D8DED4",
+    "border_strong": "#B9C9BC",
+
+    # Text
+    "ink": "#0B1F14",           # deep canopy near-black
+    "muted": "#4C5C51",
+    "faint": "#7C8B80",
+
+    # Chrome
+    "field": "#14432A",         # sidebar, masthead, primary buttons
+    "field_deep": "#0C2C1B",
+
+    # Classes: green grows, orange gets pulled
+    "crop": "#2E8B4E",
+    "crop_bright": "#46B96A",
+    "crop_soft": "#E7F2EA",
+    "weed": "#E2571F",
+    "weed_bright": "#FF8A4C",   # on dark backgrounds only
+    "weed_soft": "#FDEDE4",
+
+    "institution": "#3070B3",   # TUM blue, reserved for published figures
+    "signal": "#46B96A",
+    "warning": "#C9741A",
 }
 
 CATEGORY_COLORS = {
