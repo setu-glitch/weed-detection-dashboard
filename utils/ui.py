@@ -1,21 +1,43 @@
 """
 Interface layer.
 
-Holds the stylesheet and the small set of HTML fragments the dashboard reuses.
-Custom markup is namespaced with a ``wd-`` prefix so the styling does not depend
-on Streamlit's internal class names any more than necessary.
+Holds the stylesheet and the HTML fragments the dashboard reuses. Custom markup
+is namespaced with a ``wd-`` prefix so styling does not depend on Streamlit's
+internal class names any more than necessary.
+
+Visual direction: a field control interface. Deep canopy green carries the
+chrome, a bright crop green marks growth, and a single alert orange is reserved
+for weeds — the one thing in this system that demands action.
 """
 
 from __future__ import annotations
 
 import html
-from typing import Iterable, List, Optional, Sequence, Tuple
+import re
+from typing import Iterable, Optional, Sequence, Tuple
 
 from utils.config import PALETTE
 
+_LINE_BREAKS = re.compile(r"\s*\n\s*")
+_BETWEEN_TAGS = re.compile(r">\s+<")
+
+
+def compact(markup: str) -> str:
+    """
+    Flatten markup onto one line.
+
+    Markdown reads any line indented by four spaces as a code block, so indented
+    HTML passed to ``st.markdown`` renders as literal source instead of markup.
+    Every fragment this module emits goes through here, and any inline HTML
+    written elsewhere in the app must do the same.
+    """
+    single_line = _LINE_BREAKS.sub(" ", markup)
+    return _BETWEEN_TAGS.sub("><", single_line).strip()
+
+
 FONT_IMPORT = (
     "https://fonts.googleapis.com/css2"
-    "?family=Inter+Tight:wght@500;600;700"
+    "?family=Archivo:wght@500;600;700;800"
     "&family=Inter:wght@400;500;600"
     "&display=swap"
 )
@@ -25,187 +47,258 @@ STYLESHEET = f"""
 @import url('{FONT_IMPORT}');
 
 :root {{
-    --paper: {PALETTE['paper']};
+    --canvas: {PALETTE['canvas']};
     --surface: {PALETTE['surface']};
-    --border: {PALETTE['border']};
-    --border-strong: {PALETTE['border_strong']};
+    --line: {PALETTE['line']};
     --ink: {PALETTE['ink']};
     --muted: {PALETTE['muted']};
     --faint: {PALETTE['faint']};
-    --institution: {PALETTE['institution']};
+    --field: {PALETTE['field']};
+    --field-deep: {PALETTE['field_deep']};
     --crop: {PALETTE['crop']};
+    --crop-bright: {PALETTE['crop_bright']};
     --crop-soft: {PALETTE['crop_soft']};
     --weed: {PALETTE['weed']};
     --weed-soft: {PALETTE['weed_soft']};
-    --signal: {PALETTE['signal']};
-    --warning: {PALETTE['warning']};
+    --tum: {PALETTE['institution']};
+    --shadow: 0 1px 2px rgba(11,31,20,.05), 0 14px 32px -20px rgba(11,31,20,.28);
 }}
 
 html, body, .stApp, [class*="css"] {{
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }}
 
-.stApp {{ background: var(--paper); color: var(--ink); }}
+.stApp {{ background: var(--canvas); color: var(--ink); }}
 
 .block-container {{
-    padding-top: 2.2rem;
-    padding-bottom: 4rem;
-    max-width: 1320px;
+    padding-top: 1.6rem;
+    padding-bottom: 5rem;
+    max-width: 1360px;
 }}
 
-h1, h2, h3, h4 {{
-    font-family: 'Inter Tight', 'Inter', sans-serif;
-    color: var(--ink);
-    letter-spacing: -0.015em;
-    font-weight: 600;
-}}
+h1, h2, h3, h4 {{ font-family: 'Archivo', 'Inter', sans-serif; color: var(--ink); }}
 
-/* ---------- Page header ---------- */
+/* ---------- Masthead ---------- */
 
-.wd-header {{
+.wd-masthead {{
+    background: var(--field);
+    background-image:
+        radial-gradient(circle at 88% -30%, rgba(70,185,106,.22), transparent 58%);
+    border-radius: 16px;
+    padding: 2.1rem 2.3rem 1.9rem;
+    margin-bottom: 1.5rem;
     display: flex;
     align-items: flex-end;
     justify-content: space-between;
     gap: 2rem;
-    padding-bottom: 1.1rem;
-    border-bottom: 1px solid var(--border);
-    margin-bottom: 1.6rem;
+    color: #FFFFFF;
 }}
-.wd-header h1 {{
-    font-size: 1.85rem;
-    line-height: 1.15;
-    margin: 0 0 0.35rem 0;
+.wd-masthead h1 {{
+    font-size: 2.7rem;
+    font-weight: 800;
+    line-height: 1.02;
+    letter-spacing: -0.035em;
+    margin: 0 0 0.6rem 0;
+    color: #FFFFFF;
+    max-width: 19ch;
 }}
-.wd-header p {{
+.wd-masthead p {{
     margin: 0;
-    color: var(--muted);
-    font-size: 0.95rem;
+    font-size: 1.02rem;
+    color: rgba(255,255,255,.74);
+    max-width: 52ch;
 }}
-.wd-affiliation {{
-    color: var(--institution);
+.wd-eyebrow {{
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
     font-size: 0.82rem;
-    font-weight: 500;
-    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: var(--crop-bright);
+    margin-bottom: 0.9rem;
+}}
+.wd-eyebrow::before {{
+    content: "";
+    width: 26px;
+    height: 3px;
+    background: var(--crop-bright);
+    border-radius: 2px;
 }}
 
 .wd-status {{
     display: inline-flex;
     align-items: center;
-    gap: 0.5rem;
-    padding: 0.4rem 0.8rem;
-    border: 1px solid var(--border);
+    gap: 0.55rem;
+    padding: 0.5rem 0.95rem;
     border-radius: 999px;
-    background: var(--surface);
-    font-size: 0.82rem;
-    color: var(--muted);
+    background: rgba(255,255,255,.10);
+    border: 1px solid rgba(255,255,255,.18);
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: #FFFFFF;
     white-space: nowrap;
 }}
-.wd-dot {{
-    width: 7px; height: 7px; border-radius: 50%;
-    background: var(--signal);
-    box-shadow: 0 0 0 3px rgba(31, 157, 85, 0.14);
-}}
-.wd-dot.idle {{ background: var(--faint); box-shadow: 0 0 0 3px rgba(139,150,142,0.14); }}
-.wd-dot.warn {{ background: var(--warning); box-shadow: 0 0 0 3px rgba(180,83,9,0.14); }}
+.wd-dot {{ width: 8px; height: 8px; border-radius: 50%; background: var(--crop-bright); }}
+.wd-dot.idle {{ background: rgba(255,255,255,.5); }}
+.wd-dot.warn {{ background: #F5A524; }}
 
-/* ---------- Metric strip ---------- */
-/* One instrument readout divided by hairlines, rather than four floating cards. */
+@media (max-width: 980px) {{
+    .wd-masthead {{ flex-direction: column; align-items: flex-start; padding: 1.6rem; }}
+    .wd-masthead h1 {{ font-size: 2rem; }}
+}}
+
+/* ---------- Metric row ---------- */
 
 .wd-metrics {{
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    background: var(--surface);
-    overflow: hidden;
-    margin-bottom: 1.5rem;
+    gap: 0.9rem;
+    margin-bottom: 1.4rem;
 }}
 .wd-metric {{
-    padding: 1.05rem 1.25rem;
-    border-left: 1px solid var(--border);
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 1.35rem 1.4rem 1.25rem;
+    position: relative;
+    overflow: hidden;
 }}
-.wd-metric:first-child {{ border-left: none; }}
+.wd-metric::before {{
+    content: "";
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 5px;
+    background: var(--accent, var(--line));
+}}
 .wd-metric-label {{
-    font-size: 0.78rem;
-    color: var(--muted);
-    margin-bottom: 0.45rem;
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-}}
-.wd-metric-value {{
-    font-family: 'Inter Tight', sans-serif;
-    font-size: 1.7rem;
-    font-weight: 600;
-    line-height: 1;
-    font-variant-numeric: tabular-nums;
-    letter-spacing: -0.02em;
-}}
-.wd-metric-value .unit {{
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     font-weight: 500;
     color: var(--muted);
-    margin-left: 0.2rem;
+    margin-bottom: 0.7rem;
+}}
+.wd-metric-value {{
+    font-family: 'Archivo', sans-serif;
+    font-size: 2.9rem;
+    font-weight: 700;
+    line-height: 0.9;
+    letter-spacing: -0.045em;
+    font-variant-numeric: tabular-nums;
+    color: var(--ink);
+}}
+.wd-metric-value .unit {{
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--muted);
+    margin-left: 0.25rem;
     letter-spacing: 0;
 }}
 .wd-metric-foot {{
-    font-size: 0.75rem;
+    font-size: 0.78rem;
     color: var(--faint);
-    margin-top: 0.4rem;
+    margin-top: 0.75rem;
 }}
-.wd-swatch {{ width: 9px; height: 9px; border-radius: 2px; display: inline-block; }}
-.wd-swatch.crop {{ background: var(--crop); }}
-.wd-swatch.weed {{ background: var(--weed); }}
 
-@media (max-width: 900px) {{
+/* The weed count is the one figure here that demands action, so it is the one
+   card that inverts. */
+.wd-metric.alert {{ background: var(--field); border-color: var(--field); }}
+.wd-metric.alert .wd-metric-label {{ color: rgba(255,255,255,.72); }}
+.wd-metric.alert .wd-metric-value {{ color: {PALETTE['weed_bright']}; }}
+.wd-metric.alert .wd-metric-value .unit {{ color: rgba(255,255,255,.6); }}
+.wd-metric.alert .wd-metric-foot {{ color: rgba(255,255,255,.6); }}
+
+@media (max-width: 980px) {{
     .wd-metrics {{ grid-template-columns: repeat(2, 1fr); }}
-    .wd-metric:nth-child(3) {{ border-left: none; }}
-    .wd-metric:nth-child(n+3) {{ border-top: 1px solid var(--border); }}
+    .wd-metric-value {{ font-size: 2.2rem; }}
+}}
+
+/* ---------- Section headings ---------- */
+
+.wd-section-title {{
+    font-family: 'Archivo', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    margin: 2.4rem 0 0.5rem 0;
+}}
+.wd-section-title::after {{
+    content: "";
+    display: block;
+    width: 34px;
+    height: 4px;
+    background: var(--crop);
+    border-radius: 2px;
+    margin-top: 0.65rem;
+}}
+.wd-section-note {{
+    color: var(--muted);
+    font-size: 0.95rem;
+    line-height: 1.6;
+    max-width: 72ch;
+    margin-bottom: 1.1rem;
 }}
 
 /* ---------- Panels ---------- */
 
 .wd-panel {{
-    border: 1px solid var(--border);
-    border-radius: 10px;
+    border: 1px solid var(--line);
+    border-radius: 14px;
     background: var(--surface);
-    padding: 1.2rem 1.35rem;
-    margin-bottom: 1.1rem;
+    padding: 1.4rem 1.5rem;
+    margin-bottom: 1rem;
+    box-shadow: var(--shadow);
 }}
 .wd-panel h3 {{
-    font-size: 1rem;
-    margin: 0 0 0.2rem 0;
+    font-size: 1.08rem;
+    font-weight: 700;
+    letter-spacing: -0.015em;
+    margin: 0 0 0.7rem 0;
 }}
-.wd-panel p {{
-    color: var(--muted);
-    font-size: 0.9rem;
-    margin: 0;
-    line-height: 1.55;
+.wd-panel p {{ color: var(--muted); font-size: 0.92rem; margin: 0; line-height: 1.65; }}
+.wd-panel ul {{ margin: 0.7rem 0 0 1.15rem; color: var(--muted); font-size: 0.92rem; }}
+.wd-panel li {{ margin-bottom: 0.45rem; line-height: 1.55; }}
+.wd-panel code {{
+    background: var(--crop-soft);
+    color: var(--field);
+    padding: 0.1rem 0.35rem;
+    border-radius: 4px;
+    font-size: 0.85em;
 }}
-.wd-panel ul {{ margin: 0.6rem 0 0 1.1rem; color: var(--muted); font-size: 0.9rem; }}
-.wd-panel li {{ margin-bottom: 0.3rem; }}
 
-.wd-section-title {{
-    font-family: 'Inter Tight', sans-serif;
-    font-size: 1.05rem;
-    font-weight: 600;
-    margin: 1.9rem 0 0.35rem 0;
+/* ---------- Stat band ---------- */
+
+.wd-band {{
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: 1fr;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    overflow: hidden;
+    margin: 0.2rem 0 1.1rem 0;
 }}
-.wd-section-note {{
-    color: var(--muted);
-    font-size: 0.88rem;
-    margin-bottom: 0.9rem;
-    max-width: 68ch;
-    line-height: 1.55;
+.wd-band-cell {{ padding: 1.05rem 1.2rem; border-left: 1px solid var(--line); }}
+.wd-band-cell:first-child {{ border-left: none; }}
+.wd-band-label {{ font-size: 0.76rem; color: var(--muted); margin-bottom: 0.4rem; }}
+.wd-band-value {{
+    font-family: 'Archivo', sans-serif;
+    font-size: 1.55rem;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    font-variant-numeric: tabular-nums;
+}}
+.wd-band-value.crop {{ color: var(--crop); }}
+.wd-band-value.weed {{ color: var(--weed); }}
+
+@media (max-width: 980px) {{
+    .wd-band {{ grid-auto-flow: row; grid-auto-columns: auto; }}
+    .wd-band-cell {{ border-left: none; border-top: 1px solid var(--line); }}
+    .wd-band-cell:first-child {{ border-top: none; }}
 }}
 
 /* ---------- Key/value table ---------- */
 
-.wd-table {{ width: 100%; border-collapse: collapse; font-size: 0.9rem; }}
-.wd-table td {{
-    padding: 0.55rem 0;
-    border-bottom: 1px solid var(--border);
-}}
+.wd-table {{ width: 100%; border-collapse: collapse; font-size: 0.92rem; }}
+.wd-table td {{ padding: 0.62rem 0; border-bottom: 1px solid var(--line); }}
 .wd-table tr:last-child td {{ border-bottom: none; }}
 .wd-table td:first-child {{ color: var(--muted); }}
 .wd-table td:last-child {{
@@ -218,144 +311,179 @@ h1, h2, h3, h4 {{
 
 .wd-tag {{
     display: inline-block;
-    padding: 0.2rem 0.55rem;
-    border-radius: 5px;
-    font-size: 0.72rem;
+    padding: 0.25rem 0.6rem;
+    border-radius: 6px;
+    font-size: 0.74rem;
     font-weight: 600;
-    letter-spacing: 0.01em;
     border: 1px solid transparent;
 }}
-.wd-tag.published {{
-    background: #EDF3FA;
-    color: var(--institution);
-    border-color: #D3E2F2;
-}}
-.wd-tag.measured {{
-    background: var(--crop-soft);
-    color: var(--crop);
-    border-color: #CFE4D8;
-}}
-.wd-tag.prototype {{
-    background: var(--weed-soft);
-    color: var(--weed);
-    border-color: #F2D8C9;
-}}
+.wd-tag.published {{ background: #E9F1FA; color: var(--tum); border-color: #CFE0F2; }}
+.wd-tag.measured {{ background: var(--crop-soft); color: var(--field); border-color: #C6E2CF; }}
+.wd-tag.prototype {{ background: var(--weed-soft); color: var(--weed); border-color: #F6D6C4; }}
 
 /* ---------- Model cards ---------- */
 
 .wd-model {{
-    border: 1px solid var(--border);
-    border-radius: 10px;
+    border: 1px solid var(--line);
+    border-radius: 14px;
     background: var(--surface);
-    padding: 1rem 1.15rem;
+    padding: 1.15rem 1.2rem;
     height: 100%;
+    display: flex;
+    flex-direction: column;
 }}
-.wd-model.selected {{ border-color: var(--institution); }}
-.wd-model-head {{
-    display: flex; justify-content: space-between; align-items: baseline;
-    margin-bottom: 0.15rem;
+.wd-model.selected {{
+    border-color: var(--field);
+    box-shadow: 0 0 0 2px rgba(20,67,42,.12);
 }}
+.wd-model-head {{ display: flex; justify-content: space-between; align-items: baseline; }}
 .wd-model-name {{
-    font-family: 'Inter Tight', sans-serif;
-    font-weight: 600;
-    font-size: 1.02rem;
+    font-family: 'Archivo', sans-serif;
+    font-weight: 700;
+    font-size: 1.12rem;
+    letter-spacing: -0.02em;
 }}
-.wd-model-year {{ font-size: 0.78rem; color: var(--faint); }}
+.wd-model-year {{ font-size: 0.76rem; color: var(--faint); }}
 .wd-model-arch {{
-    font-size: 0.82rem;
+    font-size: 0.84rem;
     color: var(--muted);
-    line-height: 1.5;
-    margin-bottom: 0.75rem;
-    min-height: 2.5rem;
+    line-height: 1.55;
+    margin: 0.5rem 0 1rem;
+    flex: 1;
 }}
-.wd-model-metric {{
-    display: flex; justify-content: space-between;
-    font-size: 0.85rem;
-    padding-top: 0.55rem;
-    border-top: 1px solid var(--border);
+.wd-model-metric {{ padding-top: 0.75rem; border-top: 1px solid var(--line); }}
+.wd-model-metric-label {{ font-size: 0.74rem; color: var(--muted); margin-bottom: 0.2rem; }}
+.wd-model-metric-value {{
+    font-family: 'Archivo', sans-serif;
+    font-size: 1.6rem;
+    font-weight: 700;
+    letter-spacing: -0.035em;
+    font-variant-numeric: tabular-nums;
+    color: var(--field);
 }}
-.wd-model-metric span:last-child {{ font-weight: 600; font-variant-numeric: tabular-nums; }}
-.wd-model-missing {{ font-size: 0.78rem; color: var(--faint); }}
+.wd-model-missing {{ font-size: 0.78rem; color: var(--faint); line-height: 1.4; }}
 
 /* ---------- Pipeline ---------- */
 
 .wd-pipeline {{
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 0.6rem;
-    margin: 0.4rem 0 1.2rem 0;
+    gap: 0.9rem;
+    margin: 0.3rem 0 1.4rem 0;
 }}
 .wd-step {{
-    border: 1px solid var(--border);
-    border-radius: 9px;
-    padding: 0.9rem 1rem;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 1.15rem 1.2rem;
     background: var(--surface);
 }}
 .wd-step-index {{
-    font-size: 0.75rem;
-    color: var(--faint);
-    font-variant-numeric: tabular-nums;
-    margin-bottom: 0.3rem;
+    font-family: 'Archivo', sans-serif;
+    font-size: 1.9rem;
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -0.04em;
+    color: var(--line);
+    margin-bottom: 0.55rem;
 }}
-.wd-step-name {{ font-weight: 600; font-size: 0.92rem; margin-bottom: 0.25rem; }}
-.wd-step-detail {{ font-size: 0.8rem; color: var(--muted); line-height: 1.45; }}
-.wd-step.active {{ border-color: var(--crop); background: var(--crop-soft); }}
-.wd-step.blocked {{ border-color: var(--border-strong); background: #F6F6F4; }}
+.wd-step-name {{ font-weight: 600; font-size: 1rem; margin-bottom: 0.3rem; }}
+.wd-step-detail {{ font-size: 0.85rem; color: var(--muted); line-height: 1.5; }}
+.wd-step.active {{ border-color: var(--crop); }}
+.wd-step.active .wd-step-index {{ color: var(--crop-bright); }}
+.wd-step.blocked {{ background: #F4F6F2; border-style: dashed; }}
+.wd-step.blocked .wd-step-name {{ color: var(--muted); }}
 
-@media (max-width: 900px) {{
-    .wd-pipeline {{ grid-template-columns: repeat(2, 1fr); }}
-}}
+@media (max-width: 980px) {{ .wd-pipeline {{ grid-template-columns: repeat(2, 1fr); }} }}
 
 /* ---------- Legend ---------- */
 
-.wd-legend {{
-    display: flex; gap: 1.2rem; align-items: center;
-    font-size: 0.85rem; color: var(--muted);
-    margin: 0.5rem 0 0.9rem 0;
-}}
-.wd-legend-item {{ display: flex; align-items: center; gap: 0.45rem; }}
-.wd-legend-box {{ width: 14px; height: 14px; border-radius: 3px; border: 2px solid; }}
-
-/* ---------- Streamlit widget adjustments ---------- */
-
-section[data-testid="stSidebar"] {{
+.wd-legend {{ display: flex; gap: 0.6rem; margin: 0.6rem 0 0.9rem 0; }}
+.wd-legend-item {{
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.35rem 0.75rem;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    border: 1px solid var(--line);
     background: var(--surface);
-    border-right: 1px solid var(--border);
 }}
-section[data-testid="stSidebar"] .block-container {{ padding-top: 1.6rem; }}
+.wd-legend-box {{ width: 12px; height: 12px; border-radius: 3px; }}
+
+/* ---------- Sidebar ---------- */
+
+section[data-testid="stSidebar"] {{ background: var(--field); border-right: none; }}
+section[data-testid="stSidebar"] * {{ color: #E6EEE8; }}
+section[data-testid="stSidebar"] .block-container {{ padding-top: 1.5rem; }}
+section[data-testid="stSidebar"] [role="radiogroup"] label {{
+    padding: 0.42rem 0.6rem;
+    border-radius: 9px;
+    margin-bottom: 0.1rem;
+    transition: background 120ms ease;
+}}
+section[data-testid="stSidebar"] [role="radiogroup"] label:hover {{
+    background: rgba(255,255,255,.09);
+}}
+section[data-testid="stSidebar"] [role="radiogroup"] label p {{
+    font-size: 0.94rem;
+    font-weight: 500;
+}}
+section[data-testid="stSidebar"] hr {{ border-color: rgba(255,255,255,.16); }}
+section[data-testid="stSidebar"] [data-testid="stCaptionContainer"] p {{
+    color: rgba(255,255,255,.58);
+    font-size: 0.78rem;
+    line-height: 1.55;
+}}
+.wd-brand {{ display: flex; align-items: center; gap: 0.7rem; margin-bottom: 1.5rem; }}
+.wd-brand-mark {{
+    width: 36px; height: 36px; border-radius: 10px;
+    background: var(--crop-bright);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 1.05rem;
+    color: var(--field-deep);
+}}
+.wd-brand-name {{ font-family: 'Archivo', sans-serif; font-weight: 700; font-size: 1rem; }}
+.wd-brand-sub {{ font-size: 0.76rem; color: rgba(255,255,255,.55); }}
+.wd-sidestat {{ font-size: 0.85rem; line-height: 2; }}
+.wd-sidestat span {{ color: rgba(255,255,255,.6); }}
+.wd-sidestat strong {{ float: right; font-weight: 600; }}
+
+/* ---------- Streamlit widgets ---------- */
 
 [data-testid="stFileUploaderDropzone"] {{
-    border: 1.5px dashed var(--border-strong);
-    border-radius: 10px;
+    border: 2px dashed #B9C9BC;
+    border-radius: 14px;
     background: var(--surface);
-    box-shadow: 0 1px 2px rgba(22, 33, 27, 0.04);
+    padding: 1.6rem 1.2rem;
 }}
+[data-testid="stFileUploaderDropzone"]:hover {{ border-color: var(--crop); }}
 
 .stButton > button {{
-    border-radius: 8px;
+    border-radius: 10px;
     font-weight: 600;
-    border: 1px solid var(--border-strong);
+    padding: 0.55rem 1.3rem;
+    border: 1px solid var(--line);
 }}
 .stButton > button[kind="primary"] {{
-    background: var(--crop);
-    border-color: var(--crop);
+    background: var(--field);
+    border-color: var(--field);
+    color: #FFFFFF;
 }}
 .stButton > button[kind="primary"]:hover {{
-    background: #266641;
-    border-color: #266641;
+    background: var(--field-deep);
+    border-color: var(--field-deep);
 }}
 
 div[data-testid="stImage"] img {{
-    border-radius: 8px;
-    border: 1px solid var(--border);
+    border-radius: 12px;
+    border: 1px solid var(--line);
 }}
 
-hr {{ border-color: var(--border); }}
+.stTabs [data-baseweb="tab"] {{ font-weight: 600; }}
 
-*:focus-visible {{
-    outline: 2px solid var(--institution);
-    outline-offset: 2px;
-}}
+hr {{ border-color: var(--line); }}
+*:focus-visible {{ outline: 2px solid var(--crop); outline-offset: 2px; }}
 
 @media (prefers-reduced-motion: reduce) {{
     * {{ animation: none !important; transition: none !important; }}
@@ -374,48 +502,55 @@ def _esc(value) -> str:
 
 def header(title: str, subtitle: str, affiliation: str, status_text: str, tone: str = "ok") -> str:
     dot_class = {"ok": "", "idle": " idle", "warn": " warn"}.get(tone, "")
-    return f"""
-    <div class="wd-header">
+    return compact(f"""
+    <div class="wd-masthead">
         <div>
-            <div class="wd-affiliation">{_esc(affiliation)}</div>
+            <div class="wd-eyebrow">{_esc(affiliation)}</div>
             <h1>{_esc(title)}</h1>
             <p>{_esc(subtitle)}</p>
         </div>
         <div class="wd-status"><span class="wd-dot{dot_class}"></span>{_esc(status_text)}</div>
     </div>
-    """
+    """)
 
 
 def metric_strip(metrics: Sequence[dict]) -> str:
     cells = []
     for metric in metrics:
-        swatch = metric.get("swatch")
-        swatch_html = f'<span class="wd-swatch {swatch}"></span>' if swatch else ""
+        accent = metric.get("accent", PALETTE["line"])
+        alert = " alert" if metric.get("alert") else ""
         unit = metric.get("unit", "")
         unit_html = f'<span class="unit">{_esc(unit)}</span>' if unit else ""
         foot = metric.get("foot", "")
         foot_html = f'<div class="wd-metric-foot">{_esc(foot)}</div>' if foot else ""
         cells.append(
-            f"""
-            <div class="wd-metric">
-                <div class="wd-metric-label">{swatch_html}{_esc(metric['label'])}</div>
-                <div class="wd-metric-value">{_esc(metric['value'])}{unit_html}</div>
-                {foot_html}
-            </div>
-            """
+            f'<div class="wd-metric{alert}" style="--accent:{accent};">'
+            f'<div class="wd-metric-label">{_esc(metric["label"])}</div>'
+            f'<div class="wd-metric-value">{_esc(metric["value"])}{unit_html}</div>'
+            f"{foot_html}</div>"
         )
-    return f'<div class="wd-metrics">{"".join(cells)}</div>'
+    return compact(f'<div class="wd-metrics">{"".join(cells)}</div>')
+
+
+def stat_band(cells: Sequence[Tuple[str, str, str]]) -> str:
+    """A horizontal row of headline figures: (label, value, tone)."""
+    rendered = []
+    for label, value, tone in cells:
+        tone_class = f" {tone}" if tone else ""
+        rendered.append(
+            f'<div class="wd-band-cell"><div class="wd-band-label">{_esc(label)}</div>'
+            f'<div class="wd-band-value{tone_class}">{_esc(value)}</div></div>'
+        )
+    return compact(f'<div class="wd-band">{"".join(rendered)}</div>')
 
 
 def panel(title: str, body_html: str) -> str:
-    return f'<div class="wd-panel"><h3>{_esc(title)}</h3>{body_html}</div>'
+    return compact(f'<div class="wd-panel"><h3>{_esc(title)}</h3>{body_html}</div>')
 
 
 def kv_table(rows: Iterable[Tuple[str, str]]) -> str:
-    body = "".join(
-        f"<tr><td>{_esc(k)}</td><td>{_esc(v)}</td></tr>" for k, v in rows
-    )
-    return f'<table class="wd-table">{body}</table>'
+    body = "".join(f"<tr><td>{_esc(k)}</td><td>{_esc(v)}</td></tr>" for k, v in rows)
+    return compact(f'<table class="wd-table">{body}</table>')
 
 
 def tag(text: str, kind: str = "measured") -> str:
@@ -423,18 +558,16 @@ def tag(text: str, kind: str = "measured") -> str:
 
 
 def legend(crop_label: str = "Soybean plant", weed_label: str = "Weed") -> str:
-    return f"""
+    return compact(f"""
     <div class="wd-legend">
         <div class="wd-legend-item">
-            <span class="wd-legend-box" style="border-color:{PALETTE['crop']};
-                background:{PALETTE['crop']}22;"></span>{_esc(crop_label)}
+            <span class="wd-legend-box" style="background:{PALETTE['crop']};"></span>{_esc(crop_label)}
         </div>
         <div class="wd-legend-item">
-            <span class="wd-legend-box" style="border-color:{PALETTE['weed']};
-                background:{PALETTE['weed']}22;"></span>{_esc(weed_label)}
+            <span class="wd-legend-box" style="background:{PALETTE['weed']};"></span>{_esc(weed_label)}
         </div>
     </div>
-    """
+    """)
 
 
 def pipeline(steps: Sequence[dict]) -> str:
@@ -443,15 +576,12 @@ def pipeline(steps: Sequence[dict]) -> str:
         state = step.get("state", "")
         state_class = f" {state}" if state else ""
         cells.append(
-            f"""
-            <div class="wd-step{state_class}">
-                <div class="wd-step-index">Step {index}</div>
-                <div class="wd-step-name">{_esc(step['name'])}</div>
-                <div class="wd-step-detail">{_esc(step['detail'])}</div>
-            </div>
-            """
+            f'<div class="wd-step{state_class}">'
+            f'<div class="wd-step-index">{index}</div>'
+            f'<div class="wd-step-name">{_esc(step["name"])}</div>'
+            f'<div class="wd-step-detail">{_esc(step["detail"])}</div></div>'
         )
-    return f'<div class="wd-pipeline">{"".join(cells)}</div>'
+    return compact(f'<div class="wd-pipeline">{"".join(cells)}</div>')
 
 
 def model_card(
@@ -464,33 +594,49 @@ def model_card(
 ) -> str:
     if metric_value:
         metric_html = (
-            f'<div class="wd-model-metric"><span>{_esc(metric_label)}</span>'
-            f"<span>{_esc(metric_value)}</span></div>"
+            f'<div class="wd-model-metric">'
+            f'<div class="wd-model-metric-label">{_esc(metric_label)}</div>'
+            f'<div class="wd-model-metric-value">{_esc(metric_value)}</div></div>'
         )
     else:
         metric_html = (
-            '<div class="wd-model-metric"><span class="wd-model-missing">'
-            "No published value in benchmarks.json</span><span></span></div>"
+            '<div class="wd-model-metric"><div class="wd-model-missing">'
+            "No published value recorded</div></div>"
         )
     selected_class = " selected" if selected else ""
-    return f"""
-    <div class="wd-model{selected_class}">
-        <div class="wd-model-head">
-            <span class="wd-model-name">{_esc(name)}</span>
-            <span class="wd-model-year">{_esc(year)}</span>
-        </div>
-        <div class="wd-model-arch">{_esc(architecture)}</div>
-        {metric_html}
-    </div>
-    """
+    return compact(
+        f'<div class="wd-model{selected_class}">'
+        f'<div class="wd-model-head"><span class="wd-model-name">{_esc(name)}</span>'
+        f'<span class="wd-model-year">{_esc(year)}</span></div>'
+        f'<div class="wd-model-arch">{_esc(architecture)}</div>'
+        f"{metric_html}</div>"
+    )
 
 
 def section_title(title: str, note: str = "") -> str:
     note_html = f'<div class="wd-section-note">{_esc(note)}</div>' if note else ""
-    return f'<div class="wd-section-title">{_esc(title)}</div>{note_html}'
+    return compact(f'<div class="wd-section-title">{_esc(title)}</div>{note_html}')
 
 
 def bullet_panel(title: str, items: Sequence[str], intro: str = "") -> str:
     intro_html = f"<p>{_esc(intro)}</p>" if intro else ""
     items_html = "".join(f"<li>{_esc(item)}</li>" for item in items)
     return panel(title, f"{intro_html}<ul>{items_html}</ul>")
+
+
+def brand(name: str, sub: str, mark: str = "W") -> str:
+    return compact(
+        f'<div class="wd-brand"><div class="wd-brand-mark">{_esc(mark)}</div>'
+        f'<div><div class="wd-brand-name">{_esc(name)}</div>'
+        f'<div class="wd-brand-sub">{_esc(sub)}</div></div></div>'
+    )
+
+
+def sidebar_stats(rows: Sequence[Tuple[str, str, str]]) -> str:
+    """Sidebar status lines: (label, value, colour)."""
+    body = "".join(
+        f'<div><span>{_esc(label)}</span>'
+        f'<strong style="color:{colour};">{_esc(value)}</strong></div>'
+        for label, value, colour in rows
+    )
+    return compact(f'<div class="wd-sidestat">{body}</div>')
