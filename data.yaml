@@ -1,0 +1,13 @@
+# Dataset configuration for the soybean weed-detection dataset.
+# Replace this file with the data.yaml produced by your Roboflow export so the
+# dashboard reads the exact class names the models were trained on.
+
+path: ../datasets/soybean_weeds
+train: images/train
+val: images/val
+test: images/test
+
+nc: 2
+names:
+  0: soybean
+  1: weed

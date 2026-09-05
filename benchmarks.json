@@ -1,0 +1,45 @@
+{
+  "citation": "Results from the AI-assisted autonomous weeding study conducted at the Technical University of Munich. Add the full reference here once published.",
+  "study_notes": [
+    "YOLOv11n and YOLOv12n gave the strongest overall detection performance among the five nano-scale generations compared, at mAP@0.5 of about 0.8434 and 0.8405.",
+    "Photometric augmentation for fog, night and high-irradiance conditions raised mAP@0.5 from about 0.7767 to about 0.7988, improving generalisation to unseen lighting.",
+    "The first ten days after sowing were the most informative window for detection, before canopy growth makes weeds and seedlings harder to separate."
+  ],
+  "models": {
+    "yolov8n": {
+      "precision": null,
+      "recall": null,
+      "map50": null,
+      "map50_95": null,
+      "source": "Evaluated in the study; per-model figures not yet transcribed into this file."
+    },
+    "yolov9n": {
+      "precision": null,
+      "recall": null,
+      "map50": null,
+      "map50_95": null,
+      "source": "Evaluated in the study; per-model figures not yet transcribed into this file."
+    },
+    "yolov10n": {
+      "precision": null,
+      "recall": null,
+      "map50": null,
+      "map50_95": null,
+      "source": "Evaluated in the study; per-model figures not yet transcribed into this file."
+    },
+    "yolov11n": {
+      "precision": null,
+      "recall": null,
+      "map50": 0.8434,
+      "map50_95": null,
+      "source": "Reported in the study."
+    },
+    "yolov12n": {
+      "precision": null,
+      "recall": null,
+      "map50": 0.8405,
+      "map50_95": null,
+      "source": "Reported in the study."
+    }
+  }
+}
