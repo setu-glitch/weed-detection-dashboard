@@ -97,7 +97,7 @@ def init_state():
 def render_sidebar(statuses):
     with st.sidebar:
         st.markdown(
-            f"""
+            ui.compact(f"""
             <div style="display:flex;align-items:center;gap:0.6rem;margin-bottom:1.4rem;">
                 <div style="width:30px;height:30px;border-radius:7px;background:{cfg.PALETTE['crop']};
                      display:flex;align-items:center;justify-content:center;color:#fff;
@@ -107,7 +107,7 @@ def render_sidebar(statuses):
                     <div style="font-size:0.75rem;color:{cfg.PALETTE['muted']};">TUM research prototype</div>
                 </div>
             </div>
-            """,
+            """),
             unsafe_allow_html=True,
         )
 
@@ -119,7 +119,7 @@ def render_sidebar(statuses):
         engine_ready = model_manager.ultralytics_available()
 
         st.markdown(
-            f"""
+            ui.compact(f"""
             <div style="font-size:0.83rem;line-height:1.9;color:{cfg.PALETTE['muted']};">
                 <div>Detection engine · <strong style="color:{cfg.PALETTE['crop'] if engine_ready else cfg.PALETTE['warning']};">
                     {'Ready' if engine_ready else 'Not installed'}</strong></div>
@@ -128,7 +128,7 @@ def render_sidebar(statuses):
                 <div>FarmBot actuator · <strong style="color:{cfg.PALETTE['warning']};">Not connected</strong></div>
                 <div>Camera feed · <strong style="color:{cfg.PALETTE['warning']};">Static frame</strong></div>
             </div>
-            """,
+            """),
             unsafe_allow_html=True,
         )
 
@@ -352,7 +352,7 @@ def page_live_monitoring(statuses):
 
     with right:
         st.markdown(
-            f"""
+            ui.compact(f"""
             <div class="wd-panel">
                 <h3>Feed status</h3>
                 {ui.kv_table([
@@ -364,7 +364,7 @@ def page_live_monitoring(statuses):
                     ("Dashboard time", datetime.now().strftime("%d %b %Y, %H:%M:%S")),
                 ])}
             </div>
-            """,
+            """),
             unsafe_allow_html=True,
         )
 
@@ -784,10 +784,10 @@ def page_model_information(statuses, benchmarks):
             )
 
     st.markdown(
-        f'<div style="margin:1.2rem 0 0.6rem 0;">{ui.tag("Published study", "published")} '
+        ui.compact(f'<div style="margin:1.2rem 0 0.6rem 0;">{ui.tag("Published study", "published")} '
         f'<span style="color:{cfg.PALETTE["muted"]};font-size:0.88rem;margin-left:0.4rem;">'
         "Values below come from the training study, not from images you upload."
-        "</span></div>",
+        "</span></div>"),
         unsafe_allow_html=True,
     )
 
