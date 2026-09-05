@@ -71,8 +71,8 @@ html, body, .stApp, [class*="css"] {{
 .stApp {{ background: var(--canvas); color: var(--ink); }}
 
 .block-container {{
-    padding-top: 1.6rem;
-    padding-bottom: 5rem;
+    padding-top: 0.9rem;
+    padding-bottom: 2.5rem;
     max-width: 1360px;
 }}
 
@@ -85,8 +85,8 @@ h1, h2, h3, h4 {{ font-family: 'Archivo', 'Inter', sans-serif; color: var(--ink)
     background-image:
         radial-gradient(circle at 88% -30%, rgba(70,185,106,.22), transparent 58%);
     border-radius: 16px;
-    padding: 2.1rem 2.3rem 1.9rem;
-    margin-bottom: 1.5rem;
+    padding: 1.45rem 1.8rem 1.35rem;
+    margin-bottom: 0.95rem;
     display: flex;
     align-items: flex-end;
     justify-content: space-between;
@@ -94,17 +94,17 @@ h1, h2, h3, h4 {{ font-family: 'Archivo', 'Inter', sans-serif; color: var(--ink)
     color: #FFFFFF;
 }}
 .wd-masthead h1 {{
-    font-size: 2.7rem;
+    font-size: 2.1rem;
     font-weight: 800;
-    line-height: 1.02;
+    line-height: 1.05;
     letter-spacing: -0.035em;
-    margin: 0 0 0.6rem 0;
+    margin: 0 0 0.35rem 0;
     color: #FFFFFF;
     max-width: 19ch;
 }}
 .wd-masthead p {{
     margin: 0;
-    font-size: 1.02rem;
+    font-size: 0.94rem;
     color: rgba(255,255,255,.74);
     max-width: 52ch;
 }}
@@ -115,7 +115,7 @@ h1, h2, h3, h4 {{ font-family: 'Archivo', 'Inter', sans-serif; color: var(--ink)
     font-size: 0.82rem;
     font-weight: 600;
     color: var(--crop-bright);
-    margin-bottom: 0.9rem;
+    margin-bottom: 0.55rem;
 }}
 .wd-eyebrow::before {{
     content: "";
@@ -143,8 +143,8 @@ h1, h2, h3, h4 {{ font-family: 'Archivo', 'Inter', sans-serif; color: var(--ink)
 .wd-dot.warn {{ background: #F5A524; }}
 
 @media (max-width: 980px) {{
-    .wd-masthead {{ flex-direction: column; align-items: flex-start; padding: 1.6rem; }}
-    .wd-masthead h1 {{ font-size: 2rem; }}
+    .wd-masthead {{ flex-direction: column; align-items: flex-start; padding: 1.2rem; }}
+    .wd-masthead h1 {{ font-size: 1.7rem; }}
 }}
 
 /* ---------- Metric row ---------- */
@@ -152,14 +152,14 @@ h1, h2, h3, h4 {{ font-family: 'Archivo', 'Inter', sans-serif; color: var(--ink)
 .wd-metrics {{
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 0.9rem;
-    margin-bottom: 1.4rem;
+    gap: 0.7rem;
+    margin-bottom: 1rem;
 }}
 .wd-metric {{
     background: var(--surface);
     border: 1px solid var(--line);
     border-radius: 14px;
-    padding: 1.35rem 1.4rem 1.25rem;
+    padding: 0.95rem 1.1rem 0.9rem;
     position: relative;
     overflow: hidden;
 }}
@@ -174,13 +174,13 @@ h1, h2, h3, h4 {{ font-family: 'Archivo', 'Inter', sans-serif; color: var(--ink)
     font-size: 0.8rem;
     font-weight: 500;
     color: var(--muted);
-    margin-bottom: 0.7rem;
+    margin-bottom: 0.45rem;
 }}
 .wd-metric-value {{
     font-family: 'Archivo', sans-serif;
-    font-size: 2.9rem;
+    font-size: 2.2rem;
     font-weight: 700;
-    line-height: 0.9;
+    line-height: 0.92;
     letter-spacing: -0.045em;
     font-variant-numeric: tabular-nums;
     color: var(--ink);
@@ -195,7 +195,7 @@ h1, h2, h3, h4 {{ font-family: 'Archivo', 'Inter', sans-serif; color: var(--ink)
 .wd-metric-foot {{
     font-size: 0.78rem;
     color: var(--faint);
-    margin-top: 0.75rem;
+    margin-top: 0.5rem;
 }}
 
 /* The weed count is the one figure here that demands action, so it is the one
@@ -208,17 +208,17 @@ h1, h2, h3, h4 {{ font-family: 'Archivo', 'Inter', sans-serif; color: var(--ink)
 
 @media (max-width: 980px) {{
     .wd-metrics {{ grid-template-columns: repeat(2, 1fr); }}
-    .wd-metric-value {{ font-size: 2.2rem; }}
+    .wd-metric-value {{ font-size: 1.8rem; }}
 }}
 
 /* ---------- Section headings ---------- */
 
 .wd-section-title {{
     font-family: 'Archivo', sans-serif;
-    font-size: 1.5rem;
+    font-size: 1.3rem;
     font-weight: 700;
     letter-spacing: -0.03em;
-    margin: 2.4rem 0 0.5rem 0;
+    margin: 1.5rem 0 0.3rem 0;
 }}
 .wd-section-title::after {{
     content: "";
@@ -227,14 +227,14 @@ h1, h2, h3, h4 {{ font-family: 'Archivo', 'Inter', sans-serif; color: var(--ink)
     height: 4px;
     background: var(--crop);
     border-radius: 2px;
-    margin-top: 0.65rem;
+    margin-top: 0.45rem;
 }}
 .wd-section-note {{
     color: var(--muted);
-    font-size: 0.95rem;
-    line-height: 1.6;
-    max-width: 72ch;
-    margin-bottom: 1.1rem;
+    font-size: 0.9rem;
+    line-height: 1.55;
+    max-width: 76ch;
+    margin-bottom: 0.7rem;
 }}
 
 /* ---------- Panels ---------- */
@@ -243,19 +243,19 @@ h1, h2, h3, h4 {{ font-family: 'Archivo', 'Inter', sans-serif; color: var(--ink)
     border: 1px solid var(--line);
     border-radius: 14px;
     background: var(--surface);
-    padding: 1.4rem 1.5rem;
-    margin-bottom: 1rem;
+    padding: 1rem 1.15rem;
+    margin-bottom: 0.6rem;
     box-shadow: var(--shadow);
 }}
 .wd-panel h3 {{
     font-size: 1.08rem;
     font-weight: 700;
     letter-spacing: -0.015em;
-    margin: 0 0 0.7rem 0;
+    margin: 0 0 0.5rem 0;
 }}
 .wd-panel p {{ color: var(--muted); font-size: 0.92rem; margin: 0; line-height: 1.65; }}
-.wd-panel ul {{ margin: 0.7rem 0 0 1.15rem; color: var(--muted); font-size: 0.92rem; }}
-.wd-panel li {{ margin-bottom: 0.45rem; line-height: 1.55; }}
+.wd-panel ul {{ margin: 0.5rem 0 0 1.1rem; color: var(--muted); font-size: 0.92rem; }}
+.wd-panel li {{ margin-bottom: 0.3rem; line-height: 1.5; }}
 .wd-panel code {{
     background: var(--crop-soft);
     color: var(--field);
@@ -274,14 +274,14 @@ h1, h2, h3, h4 {{ font-family: 'Archivo', 'Inter', sans-serif; color: var(--ink)
     border: 1px solid var(--line);
     border-radius: 14px;
     overflow: hidden;
-    margin: 0.2rem 0 1.1rem 0;
+    margin: 0.1rem 0 0.8rem 0;
 }}
-.wd-band-cell {{ padding: 1.05rem 1.2rem; border-left: 1px solid var(--line); }}
+.wd-band-cell {{ padding: 0.75rem 1rem; border-left: 1px solid var(--line); }}
 .wd-band-cell:first-child {{ border-left: none; }}
-.wd-band-label {{ font-size: 0.76rem; color: var(--muted); margin-bottom: 0.4rem; }}
+.wd-band-label {{ font-size: 0.74rem; color: var(--muted); margin-bottom: 0.3rem; }}
 .wd-band-value {{
     font-family: 'Archivo', sans-serif;
-    font-size: 1.55rem;
+    font-size: 1.32rem;
     font-weight: 700;
     letter-spacing: -0.03em;
     font-variant-numeric: tabular-nums;
@@ -298,7 +298,7 @@ h1, h2, h3, h4 {{ font-family: 'Archivo', 'Inter', sans-serif; color: var(--ink)
 /* ---------- Key/value table ---------- */
 
 .wd-table {{ width: 100%; border-collapse: collapse; font-size: 0.92rem; }}
-.wd-table td {{ padding: 0.62rem 0; border-bottom: 1px solid var(--line); }}
+.wd-table td {{ padding: 0.46rem 0; border-bottom: 1px solid var(--line); }}
 .wd-table tr:last-child td {{ border-bottom: none; }}
 .wd-table td:first-child {{ color: var(--muted); }}
 .wd-table td:last-child {{
@@ -327,7 +327,7 @@ h1, h2, h3, h4 {{ font-family: 'Archivo', 'Inter', sans-serif; color: var(--ink)
     border: 1px solid var(--line);
     border-radius: 14px;
     background: var(--surface);
-    padding: 1.15rem 1.2rem;
+    padding: 0.9rem 1rem;
     height: 100%;
     display: flex;
     flex-direction: column;
@@ -347,15 +347,15 @@ h1, h2, h3, h4 {{ font-family: 'Archivo', 'Inter', sans-serif; color: var(--ink)
 .wd-model-arch {{
     font-size: 0.84rem;
     color: var(--muted);
-    line-height: 1.55;
-    margin: 0.5rem 0 1rem;
+    line-height: 1.5;
+    margin: 0.4rem 0 0.7rem;
     flex: 1;
 }}
-.wd-model-metric {{ padding-top: 0.75rem; border-top: 1px solid var(--line); }}
+.wd-model-metric {{ padding-top: 0.55rem; border-top: 1px solid var(--line); }}
 .wd-model-metric-label {{ font-size: 0.74rem; color: var(--muted); margin-bottom: 0.2rem; }}
 .wd-model-metric-value {{
     font-family: 'Archivo', sans-serif;
-    font-size: 1.6rem;
+    font-size: 1.4rem;
     font-weight: 700;
     letter-spacing: -0.035em;
     font-variant-numeric: tabular-nums;
@@ -368,26 +368,26 @@ h1, h2, h3, h4 {{ font-family: 'Archivo', 'Inter', sans-serif; color: var(--ink)
 .wd-pipeline {{
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 0.9rem;
-    margin: 0.3rem 0 1.4rem 0;
+    gap: 0.7rem;
+    margin: 0.2rem 0 0.9rem 0;
 }}
 .wd-step {{
     border: 1px solid var(--line);
     border-radius: 14px;
-    padding: 1.15rem 1.2rem;
+    padding: 0.85rem 1rem;
     background: var(--surface);
 }}
 .wd-step-index {{
     font-family: 'Archivo', sans-serif;
-    font-size: 1.9rem;
+    font-size: 1.5rem;
     font-weight: 800;
     line-height: 1;
     letter-spacing: -0.04em;
     color: var(--line);
-    margin-bottom: 0.55rem;
+    margin-bottom: 0.35rem;
 }}
-.wd-step-name {{ font-weight: 600; font-size: 1rem; margin-bottom: 0.3rem; }}
-.wd-step-detail {{ font-size: 0.85rem; color: var(--muted); line-height: 1.5; }}
+.wd-step-name {{ font-weight: 600; font-size: 0.95rem; margin-bottom: 0.22rem; }}
+.wd-step-detail {{ font-size: 0.82rem; color: var(--muted); line-height: 1.45; }}
 .wd-step.active {{ border-color: var(--crop); }}
 .wd-step.active .wd-step-index {{ color: var(--crop-bright); }}
 .wd-step.blocked {{ background: #F4F6F2; border-style: dashed; }}
@@ -397,7 +397,7 @@ h1, h2, h3, h4 {{ font-family: 'Archivo', 'Inter', sans-serif; color: var(--ink)
 
 /* ---------- Legend ---------- */
 
-.wd-legend {{ display: flex; gap: 0.6rem; margin: 0.6rem 0 0.9rem 0; }}
+.wd-legend {{ display: flex; gap: 0.5rem; margin: 0.35rem 0 0.55rem 0; }}
 .wd-legend-item {{
     display: inline-flex;
     align-items: center;
@@ -415,7 +415,7 @@ h1, h2, h3, h4 {{ font-family: 'Archivo', 'Inter', sans-serif; color: var(--ink)
 
 section[data-testid="stSidebar"] {{ background: var(--field); border-right: none; }}
 section[data-testid="stSidebar"] * {{ color: #E6EEE8; }}
-section[data-testid="stSidebar"] .block-container {{ padding-top: 1.5rem; }}
+section[data-testid="stSidebar"] .block-container {{ padding-top: 1.1rem; }}
 section[data-testid="stSidebar"] [role="radiogroup"] label {{
     padding: 0.42rem 0.6rem;
     border-radius: 9px;
@@ -435,7 +435,7 @@ section[data-testid="stSidebar"] [data-testid="stCaptionContainer"] p {{
     font-size: 0.78rem;
     line-height: 1.55;
 }}
-.wd-brand {{ display: flex; align-items: center; gap: 0.7rem; margin-bottom: 1.5rem; }}
+.wd-brand {{ display: flex; align-items: center; gap: 0.7rem; margin-bottom: 0.9rem; }}
 .wd-brand-mark {{
     width: 36px; height: 36px; border-radius: 10px;
     background: var(--crop-bright);
@@ -445,7 +445,7 @@ section[data-testid="stSidebar"] [data-testid="stCaptionContainer"] p {{
 }}
 .wd-brand-name {{ font-family: 'Archivo', sans-serif; font-weight: 700; font-size: 1rem; }}
 .wd-brand-sub {{ font-size: 0.76rem; color: rgba(255,255,255,.55); }}
-.wd-sidestat {{ font-size: 0.85rem; line-height: 2; }}
+.wd-sidestat {{ font-size: 0.84rem; line-height: 1.85; }}
 .wd-sidestat span {{ color: rgba(255,255,255,.6); }}
 .wd-sidestat strong {{ float: right; font-weight: 600; }}
 
@@ -455,7 +455,7 @@ section[data-testid="stSidebar"] [data-testid="stCaptionContainer"] p {{
     border: 2px dashed #B9C9BC;
     border-radius: 14px;
     background: var(--surface);
-    padding: 1.6rem 1.2rem;
+    padding: 0.9rem 1rem;
 }}
 [data-testid="stFileUploaderDropzone"]:hover {{ border-color: var(--crop); }}
 
@@ -484,6 +484,25 @@ div[data-testid="stImage"] img {{
 
 hr {{ border-color: var(--line); }}
 *:focus-visible {{ outline: 2px solid var(--crop); outline-offset: 2px; }}
+
+/* ---------- Vertical rhythm ---------- */
+/* Streamlit's default element gap stacks on top of card padding, which is what
+   produces the drifts of empty space between blocks. */
+
+[data-testid="stVerticalBlock"] {{ gap: 0.6rem; }}
+[data-testid="stHorizontalBlock"] {{ gap: 1rem; }}
+section[data-testid="stSidebar"] [data-testid="stVerticalBlock"] {{ gap: 0.35rem; }}
+
+/* Streamlit leaves empty containers behind; they still occupy a gap. */
+[data-testid="stElementContainer"]:empty,
+[data-testid="stVerticalBlock"]:empty {{ display: none; }}
+
+hr {{ margin: 0.8rem 0; }}
+[data-testid="stExpander"] {{ margin-bottom: 0.2rem; }}
+[data-testid="stCaptionContainer"] p {{ margin-bottom: 0.15rem; }}
+.stTabs [data-baseweb="tab-panel"] {{ padding-top: 0.5rem; }}
+div[data-testid="stImage"] {{ margin-bottom: 0.15rem; }}
+[data-testid="stSlider"], [data-testid="stSelectbox"] {{ padding-bottom: 0.15rem; }}
 
 @media (prefers-reduced-motion: reduce) {{
     * {{ animation: none !important; transition: none !important; }}
