@@ -82,7 +82,9 @@ h1, h2, h3, h4 {{ font-family: 'Archivo', 'Inter', sans-serif; color: var(--ink)
 
 .wd-masthead {{
     background: var(--field);
-    min-height: 168px;
+    min-height: 220px;
+    position: relative;
+    overflow: hidden;
     background-image:
         radial-gradient(circle at 88% -30%, rgba(70,185,106,.22), transparent 58%);
     border-radius: 16px;
@@ -94,6 +96,7 @@ h1, h2, h3, h4 {{ font-family: 'Archivo', 'Inter', sans-serif; color: var(--ink)
     gap: 2rem;
     color: #FFFFFF;
 }}
+.wd-masthead > div {{ position: relative; z-index: 1; }}
 .wd-masthead h1 {{
     font-size: 2.1rem;
     font-weight: 800;
@@ -522,29 +525,33 @@ def _esc(value) -> str:
 
 def masthead_photo_css(data_uri: str) -> str:
     """
-    Blend a photograph into the masthead.
+    Blend a photograph into the right of the masthead.
 
-    The image is held in a custom property so both the wide and the narrow
-    rule can reference it without repeating the encoded data. On wide screens
-    the fade runs left to right and leaves the headline over solid colour; on
-    narrow screens the layout stacks, so the overlay goes nearly opaque to keep
-    the text readable over whatever lands behind it.
+    The photo sits in its own panel rather than stretching across the whole
+    banner: a masthead is roughly 6:1 and a photograph is roughly 3:2, so
+    covering the full width crops a thin horizontal band and reads as a zoomed
+    smear. A panel a little under half the width is close to the picture's own
+    proportions, so almost nothing is cut. A mask fades it into the green
+    instead of ending on a hard edge.
     """
     if not data_uri:
         return ""
-    field = PALETTE["field"]
+    fade = (
+        "linear-gradient(to right, transparent 0%, "
+        "rgba(0,0,0,.55) 40%, rgba(0,0,0,1) 100%)"
+    )
+    fade_stacked = (
+        "linear-gradient(to bottom, transparent 0%, rgba(0,0,0,.30) 100%)"
+    )
     return (
         "<style>"
-        f".wd-masthead{{--banner:url('{data_uri}');"
-        f"background-image:linear-gradient(100deg,{field} 0%,{field} 40%,"
-        "rgba(20,67,42,.90) 56%,rgba(20,67,42,.55) 78%,rgba(20,67,42,.34) 100%),"
-        "var(--banner);"
-        "background-size:cover;background-position:center right;"
-        "background-repeat:no-repeat;}"
-        "@media (max-width:980px){.wd-masthead{"
-        "background-image:linear-gradient(180deg,rgba(20,67,42,.96) 0%,"
-        "rgba(20,67,42,.80) 100%),var(--banner);"
-        "background-position:center;}}"
+        f".wd-masthead{{--banner:url('{data_uri}');}}"
+        '.wd-masthead::after{content:"";position:absolute;top:0;right:0;bottom:0;'
+        "width:46%;background-image:var(--banner);background-size:cover;"
+        "background-position:center;background-repeat:no-repeat;z-index:0;"
+        f"-webkit-mask-image:{fade};mask-image:{fade};}}"
+        "@media (max-width:980px){.wd-masthead::after{width:100%;"
+        f"-webkit-mask-image:{fade_stacked};mask-image:{fade_stacked};}}}}"
         "</style>"
     )
 
