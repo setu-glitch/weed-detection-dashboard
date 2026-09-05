@@ -9,9 +9,26 @@ on Streamlit's internal class names any more than necessary.
 from __future__ import annotations
 
 import html
+import re
 from typing import Iterable, List, Optional, Sequence, Tuple
 
 from utils.config import PALETTE
+
+_LINE_BREAKS = re.compile(r"\s*\n\s*")
+_BETWEEN_TAGS = re.compile(r">\s+<")
+
+
+def compact(markup: str) -> str:
+    """
+    Flatten markup onto one line.
+
+    Markdown reads any line indented by four spaces as a code block, so indented
+    HTML passed to ``st.markdown`` is rendered as literal source instead of
+    markup. Every fragment this module emits goes through here, and any inline
+    HTML written elsewhere in the app must do the same.
+    """
+    single_line = _LINE_BREAKS.sub(" ", markup)
+    return _BETWEEN_TAGS.sub("><", single_line).strip()
 
 FONT_IMPORT = (
     "https://fonts.googleapis.com/css2"
@@ -374,7 +391,7 @@ def _esc(value) -> str:
 
 def header(title: str, subtitle: str, affiliation: str, status_text: str, tone: str = "ok") -> str:
     dot_class = {"ok": "", "idle": " idle", "warn": " warn"}.get(tone, "")
-    return f"""
+    return compact(f"""
     <div class="wd-header">
         <div>
             <div class="wd-affiliation">{_esc(affiliation)}</div>
@@ -383,7 +400,7 @@ def header(title: str, subtitle: str, affiliation: str, status_text: str, tone: 
         </div>
         <div class="wd-status"><span class="wd-dot{dot_class}"></span>{_esc(status_text)}</div>
     </div>
-    """
+    """)
 
 
 def metric_strip(metrics: Sequence[dict]) -> str:
@@ -404,18 +421,18 @@ def metric_strip(metrics: Sequence[dict]) -> str:
             </div>
             """
         )
-    return f'<div class="wd-metrics">{"".join(cells)}</div>'
+    return compact(f'<div class="wd-metrics">{"".join(cells)}</div>')
 
 
 def panel(title: str, body_html: str) -> str:
-    return f'<div class="wd-panel"><h3>{_esc(title)}</h3>{body_html}</div>'
+    return compact(f'<div class="wd-panel"><h3>{_esc(title)}</h3>{body_html}</div>')
 
 
 def kv_table(rows: Iterable[Tuple[str, str]]) -> str:
     body = "".join(
         f"<tr><td>{_esc(k)}</td><td>{_esc(v)}</td></tr>" for k, v in rows
     )
-    return f'<table class="wd-table">{body}</table>'
+    return compact(f'<table class="wd-table">{body}</table>')
 
 
 def tag(text: str, kind: str = "measured") -> str:
@@ -423,7 +440,7 @@ def tag(text: str, kind: str = "measured") -> str:
 
 
 def legend(crop_label: str = "Soybean plant", weed_label: str = "Weed") -> str:
-    return f"""
+    return compact(f"""
     <div class="wd-legend">
         <div class="wd-legend-item">
             <span class="wd-legend-box" style="border-color:{PALETTE['crop']};
@@ -434,7 +451,7 @@ def legend(crop_label: str = "Soybean plant", weed_label: str = "Weed") -> str:
                 background:{PALETTE['weed']}22;"></span>{_esc(weed_label)}
         </div>
     </div>
-    """
+    """)
 
 
 def pipeline(steps: Sequence[dict]) -> str:
@@ -451,7 +468,7 @@ def pipeline(steps: Sequence[dict]) -> str:
             </div>
             """
         )
-    return f'<div class="wd-pipeline">{"".join(cells)}</div>'
+    return compact(f'<div class="wd-pipeline">{"".join(cells)}</div>')
 
 
 def model_card(
@@ -473,7 +490,7 @@ def model_card(
             "No published value in benchmarks.json</span><span></span></div>"
         )
     selected_class = " selected" if selected else ""
-    return f"""
+    return compact(f"""
     <div class="wd-model{selected_class}">
         <div class="wd-model-head">
             <span class="wd-model-name">{_esc(name)}</span>
@@ -482,12 +499,12 @@ def model_card(
         <div class="wd-model-arch">{_esc(architecture)}</div>
         {metric_html}
     </div>
-    """
+    """)
 
 
 def section_title(title: str, note: str = "") -> str:
     note_html = f'<div class="wd-section-note">{_esc(note)}</div>' if note else ""
-    return f'<div class="wd-section-title">{_esc(title)}</div>{note_html}'
+    return compact(f'<div class="wd-section-title">{_esc(title)}</div>{note_html}')
 
 
 def bullet_panel(title: str, items: Sequence[str], intro: str = "") -> str:
