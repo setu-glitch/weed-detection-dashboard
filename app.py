@@ -97,17 +97,7 @@ def init_state():
 def render_sidebar(statuses):
     with st.sidebar:
         st.markdown(
-            ui.compact(f"""
-            <div style="display:flex;align-items:center;gap:0.6rem;margin-bottom:1.4rem;">
-                <div style="width:30px;height:30px;border-radius:7px;background:{cfg.PALETTE['crop']};
-                     display:flex;align-items:center;justify-content:center;color:#fff;
-                     font-weight:700;font-family:'Inter Tight',sans-serif;">W</div>
-                <div style="line-height:1.2;">
-                    <div style="font-weight:600;font-size:0.95rem;">Weed Management</div>
-                    <div style="font-size:0.75rem;color:{cfg.PALETTE['muted']};">TUM research prototype</div>
-                </div>
-            </div>
-            """),
+            ui.brand("Weed Management", "TUM research prototype"),
             unsafe_allow_html=True,
         )
 
@@ -119,16 +109,18 @@ def render_sidebar(statuses):
         engine_ready = model_manager.ultralytics_available()
 
         st.markdown(
-            ui.compact(f"""
-            <div style="font-size:0.83rem;line-height:1.9;color:{cfg.PALETTE['muted']};">
-                <div>Detection engine · <strong style="color:{cfg.PALETTE['crop'] if engine_ready else cfg.PALETTE['warning']};">
-                    {'Ready' if engine_ready else 'Not installed'}</strong></div>
-                <div>Models installed · <strong style="color:{cfg.PALETTE['ink']};">
-                    {len(installed)} of {len(statuses)}</strong></div>
-                <div>FarmBot actuator · <strong style="color:{cfg.PALETTE['warning']};">Not connected</strong></div>
-                <div>Camera feed · <strong style="color:{cfg.PALETTE['warning']};">Static frame</strong></div>
-            </div>
-            """),
+            ui.sidebar_stats(
+                [
+                    (
+                        "Detection engine",
+                        "Ready" if engine_ready else "Not installed",
+                        cfg.PALETTE["crop_bright"] if engine_ready else cfg.PALETTE["weed_bright"],
+                    ),
+                    ("Models installed", f"{len(installed)} of {len(statuses)}", "#FFFFFF"),
+                    ("FarmBot actuator", "Not connected", cfg.PALETTE["weed_bright"]),
+                    ("Camera feed", "Static frame", cfg.PALETTE["weed_bright"]),
+                ]
+            ),
             unsafe_allow_html=True,
         )
 
@@ -145,10 +137,30 @@ def render_metric_strip():
     result = st.session_state.get("last_result")
     if result is None:
         metrics = [
-            {"label": "Soybean plants", "value": "—", "swatch": "crop", "foot": "Awaiting a detection run"},
-            {"label": "Weeds", "value": "—", "swatch": "weed", "foot": "Awaiting a detection run"},
-            {"label": "Mean confidence", "value": "—", "foot": "Across all detected objects"},
-            {"label": "Inference time", "value": "—", "foot": "Forward pass on CPU"},
+            {
+                "label": "Soybean plants",
+                "value": "—",
+                "accent": cfg.PALETTE["crop"],
+                "foot": "Run a detection to populate",
+            },
+            {
+                "label": "Weeds",
+                "value": "—",
+                "alert": True,
+                "foot": "Run a detection to populate",
+            },
+            {
+                "label": "Mean confidence",
+                "value": "—",
+                "accent": cfg.PALETTE["institution"],
+                "foot": "Across all detected objects",
+            },
+            {
+                "label": "Inference time",
+                "value": "—",
+                "accent": cfg.PALETTE["field"],
+                "foot": "Forward pass on CPU",
+            },
         ]
     else:
         origin = st.session_state.get("result_origin", "last run")
@@ -156,25 +168,27 @@ def render_metric_strip():
             {
                 "label": "Soybean plants",
                 "value": f"{result.crop_count}",
-                "swatch": "crop",
+                "accent": cfg.PALETTE["crop"],
                 "foot": origin,
             },
             {
                 "label": "Weeds",
                 "value": f"{result.weed_count}",
-                "swatch": "weed",
+                "alert": True,
                 "foot": f"{result.weed_share:.0f}% of detected objects",
             },
             {
                 "label": "Mean confidence",
                 "value": f"{result.mean_confidence * 100:.1f}",
                 "unit": "%",
+                "accent": cfg.PALETTE["institution"],
                 "foot": f"Threshold {result.confidence_threshold:.2f}",
             },
             {
                 "label": "Inference time",
                 "value": f"{result.inference_ms:.0f}",
                 "unit": "ms",
+                "accent": cfg.PALETTE["field"],
                 "foot": f"{result.model_label} · CPU",
             },
         ]
@@ -516,14 +530,29 @@ def page_weed_detection(statuses):
 
 
 def render_results(result):
+    """Results layout: the annotated frame leads, figures sit under it."""
     annotated = st.session_state.get("last_annotated")
     original = st.session_state.get("last_original")
 
     st.markdown(
         ui.section_title(
             "Detection results",
-            f"Source: {result.source_name or 'unnamed image'} · "
-            f"{result.model_label} · {datetime.fromtimestamp(result.timestamp).strftime('%H:%M:%S')}",
+            f"{result.source_name or 'Unnamed image'} · {result.model_label} · "
+            f"{datetime.fromtimestamp(result.timestamp).strftime('%H:%M:%S')}",
+        ),
+        unsafe_allow_html=True,
+    )
+
+    st.markdown(
+        ui.stat_band(
+            [
+                ("Objects detected", f"{result.total}", ""),
+                ("Weeds", f"{result.weed_count}", "weed"),
+                ("Soybean plants", f"{result.crop_count}", "crop"),
+                ("Weed share", f"{result.weed_share:.1f}%", "weed"),
+                ("Mean confidence", f"{result.mean_confidence * 100:.1f}%", ""),
+                ("Inference", f"{result.inference_ms:.0f} ms", ""),
+            ]
         ),
         unsafe_allow_html=True,
     )
@@ -534,52 +563,67 @@ def render_results(result):
             f"{result.image_size[0]}×{result.image_size[1]} px before inference."
         )
 
-    image_col, summary_col = st.columns([3, 2], gap="large")
+    tab_detected, tab_original, tab_density = st.tabs(
+        ["Detections", "Original image", "Weed density"]
+    )
+    with tab_detected:
+        st.markdown(ui.legend(), unsafe_allow_html=True)
+        if annotated is not None:
+            st.image(annotated, use_container_width=True)
+        if not result.detections:
+            st.info(
+                "The model found no objects above the confidence threshold. "
+                "Lower the threshold or try a higher inference resolution."
+            )
+    with tab_original:
+        if original is not None:
+            st.image(original, use_container_width=True, caption="Image as passed to the model")
+    with tab_density:
+        if original is not None:
+            st.image(
+                density_overlay(original, result.detections),
+                use_container_width=True,
+                caption="Weed concentration per grid cell in this image",
+            )
+            st.caption(
+                "Shading reflects weed detections in this frame only. Field-level "
+                "density mapping needs georeferenced captures."
+            )
 
-    with image_col:
-        tab_detected, tab_original, tab_density = st.tabs(
-            ["Detections", "Original image", "Weed density"]
-        )
-        with tab_detected:
-            st.markdown(ui.legend(), unsafe_allow_html=True)
-            if annotated is not None:
-                st.image(annotated, use_container_width=True)
+    detail_col, meta_col = st.columns([3, 2], gap="large")
+
+    with detail_col:
+        if result.detections:
+            st.markdown("**Detected objects**")
+            rows = detections_to_rows(result)
+            st.dataframe(rows, use_container_width=True, hide_index=True, height=280)
+            download_left, download_right = st.columns(2)
+            with download_left:
                 st.download_button(
                     "Download annotated image",
-                    data=to_png_bytes(annotated),
+                    data=to_png_bytes(annotated) if annotated is not None else b"",
                     file_name=f"detections_{result.model_key}.png",
                     mime="image/png",
-                )
-            if not result.detections:
-                st.info(
-                    "The model found no objects above the confidence threshold. "
-                    "Lower the threshold or try a higher inference resolution."
-                )
-        with tab_original:
-            if original is not None:
-                st.image(original, use_container_width=True, caption="Image as passed to the model")
-        with tab_density:
-            if original is not None:
-                st.image(
-                    density_overlay(original, result.detections),
                     use_container_width=True,
-                    caption="Weed concentration per grid cell in this image",
                 )
-                st.caption(
-                    "Shading reflects weed detections in this frame only. Field-level "
-                    "density mapping needs georeferenced captures."
+            with download_right:
+                st.download_button(
+                    "Download detections (CSV)",
+                    data=rows_to_csv(rows),
+                    file_name=f"detections_{result.model_key}.csv",
+                    mime="text/csv",
+                    use_container_width=True,
                 )
 
-    with summary_col:
+    with meta_col:
         st.markdown(
             ui.panel(
-                "Detection summary",
+                "Run details",
                 f'<p style="margin-bottom:0.7rem;">{ui.tag("Measured on your image")}</p>'
                 + ui.kv_table(result.as_summary_rows()),
             ),
             unsafe_allow_html=True,
         )
-
         class_counts = result.class_counts()
         if class_counts:
             st.markdown(
@@ -588,17 +632,6 @@ def render_results(result):
                     ui.kv_table([(name, str(count)) for name, count in class_counts.items()]),
                 ),
                 unsafe_allow_html=True,
-            )
-
-    if result.detections:
-        with st.expander(f"All {result.total} detected objects"):
-            rows = detections_to_rows(result)
-            st.dataframe(rows, use_container_width=True, hide_index=True)
-            st.download_button(
-                "Download detections as CSV",
-                data=rows_to_csv(rows),
-                file_name=f"detections_{result.model_key}.csv",
-                mime="text/csv",
             )
 
 
